@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ni.edu.uam.practicahilos.ProcesadorController"
+      stylesheets="@styles.css"
+      prefWidth="700"
+      prefHeight="540"
+      spacing="12">
+
+    <padding>
+        <Insets top="16" right="20" bottom="16" left="20"/>
+    </padding>
+
+    <!-- Encabezado Corporativo NicaData Solutions S.A. -->
+    <VBox spacing="3">
+        <Label text="NicaData Solutions S.A."
+               styleClass="titulo-principal"/>
+        <Label text="Sistema de Procesamiento Concurrente y Gestión de Hilos"
+               styleClass="subtitulo"/>
+    </VBox>
+
+    <Separator/>
+
+    <!-- Sistema de Pestañas: Reto Final, Caso Básico y Análisis de Bloqueo -->
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+        <!-- ============================================================= -->
+        <!-- PESTAÑA 1: RETO FINAL (MONITOR CONCURRENTE EMPRESARIAL)       -->
+        <!-- ============================================================= -->
+        <Tab text="Monitor Empresarial (Reto Final)">
+            <VBox spacing="14">
+                <padding>
+                    <Insets top="14" right="10" bottom="10" left="10"/>
+                </padding>
+
+                <!-- Tarjeta 1: Hilo de Clientes -->
+                <VBox spacing="8" styleClass="card-box">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="Procesamiento de Clientes" styleClass="card-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblPorcentajeClientes" text="0% (0/100)" styleClass="porcentaje-label"/>
+                    </HBox>
+
+                    <Label fx:id="lblEstadoClientes" text="Esperando inicio" styleClass="estado-label"/>
+
+                    <ProgressBar fx:id="barraClientes" progress="0" maxWidth="Infinity" prefHeight="22"/>
+
+                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Label text="Meta: 100 registros | 80 ms/reg" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnIniciarClientes" text="Iniciar Clientes" styleClass="btn-primary" onAction="#iniciarClientes"/>
+                        <Button fx:id="btnDetenerClientes" text="Detener" styleClass="btn-danger" onAction="#detenerClientes" disable="true"/>
+                        <Button fx:id="btnReiniciarClientes" text="Reiniciar" styleClass="btn-secondary" onAction="#reiniciarClientes"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Tarjeta 2: Hilo de Productos -->
+                <VBox spacing="8" styleClass="card-box">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="Procesamiento de Productos" styleClass="card-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblPorcentajeProductos" text="0% (0/50)" styleClass="porcentaje-label" style="-fx-text-fill: #059669;"/>
+                    </HBox>
+
+                    <Label fx:id="lblEstadoProductos" text="Esperando inicio" styleClass="estado-label"/>
+
+                    <ProgressBar fx:id="barraProductos" progress="0" maxWidth="Infinity" prefHeight="22" styleClass="progress-bar-products"/>
+
+                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Label text="Meta: 50 registros | 140 ms/reg" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnIniciarProductos" text="Iniciar Productos" styleClass="btn-primary" onAction="#iniciarProductos"/>
+                        <Button fx:id="btnDetenerProductos" text="Detener" styleClass="btn-danger" onAction="#detenerProductos" disable="true"/>
+                        <Button fx:id="btnReiniciarProductos" text="Reiniciar" styleClass="btn-secondary" onAction="#reiniciarProductos"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Controladores Globales -->
+                <HBox alignment="CENTER" spacing="12" style="-fx-padding: 4 0 0 0;">
+                    <Button text="▶ Iniciar Ambos Procesos" styleClass="btn-primary" onAction="#iniciarTodos"/>
+                    <Button text="⏹ Detener Todos" styleClass="btn-danger" onAction="#detenerTodos"/>
+                    <Button text="↺ Reiniciar Todos" styleClass="btn-secondary" onAction="#reiniciarTodos"/>
+                </HBox>
+            </VBox>
+        </Tab>
+
+        <!-- ============================================================= -->
+        <!-- PESTAÑA 2: CASO BÁSICO (PASOS 1 A 5 DE LA GUÍA)               -->
+        <!-- ============================================================= -->
+        <Tab text="Proceso Básico (Pasos 1-5)">
+            <VBox alignment="CENTER" spacing="20">
+                <padding>
+                    <Insets top="25" right="25" bottom="25" left="25"/>
+                </padding>
+
+                <Label text="Procesador de registros"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+                <Label fx:id="lblEstado"
+                       text="Esperando inicio"
+                       style="-fx-font-size: 14px;"/>
+
+                <ProgressBar fx:id="barraProgreso"
+                             progress="0"
+                             prefWidth="420"
+                             prefHeight="24"/>
+
+                <Label fx:id="lblPorcentaje"
+                       text="0%"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+
+                <HBox alignment="CENTER" spacing="12">
+                    <Button fx:id="btnIniciar"
+                            text="Iniciar"
+                            styleClass="btn-primary"
+                            onAction="#iniciarProceso"/>
+
+                    <Button fx:id="btnDetener"
+                            text="Detener"
+                            styleClass="btn-danger"
+                            onAction="#detenerProceso"
+                            disable="true"/>
+
+                    <Button fx:id="btnReiniciar"
+                            text="Reiniciar"
+                            styleClass="btn-secondary"
+                            onAction="#reiniciarProceso"/>
+                </HBox>
+            </VBox>
+        </Tab>
+
+        <!-- ============================================================= -->
+        <!-- PESTAÑA 3: EXPERIMENTO Y PREGUNTA DE ANÁLISIS (PASO 6)        -->
+        <!-- ============================================================= -->
+        <Tab text="Análisis de Bloqueo UI (Paso 6)">
+            <VBox spacing="15">
+                <padding>
+                    <Insets top="18" right="20" bottom="18" left="20"/>
+                </padding>
+
+                <VBox spacing="6" styleClass="card-box">
+                    <Label text="Experimento: Bloqueo del JavaFX Application Thread" styleClass="card-title"/>
+                    <Label text="Al presionar el botón inferior, se ejecutará Thread.sleep(5000) en el hilo principal de la UI. Observe cómo la ventana deja de responder, no se puede arrastrar ni redimensionar durante 5 segundos."
+                           wrapText="true"
+                           style="-fx-text-fill: #475569;"/>
+
+                    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 10 0 0 0;">
+                        <Button fx:id="btnBloqueante"
+                                text="⚠ Ejecutar Proceso Bloqueante (5s)"
+                                styleClass="btn-danger"
+                                onAction="#procesoBloqueante"/>
+                        <Label fx:id="lblEstadoBloqueo"
+                               text="Estado: Normal (UI Desbloqueada)"
+                               styleClass="estado-label"/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="6" styleClass="card-box" style="-fx-background-color: #f8fafc;">
+                    <Label text="Pregunta de Análisis: ¿Por qué no debemos ejecutar procesos prolongados dentro de eventos de JavaFX?"
+                           style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;"/>
+                    <Label text="JavaFX opera bajo un modelo de hilo único de renderizado y despacho de eventos (JavaFX Application Thread). Si una tarea pesada o una llamada bloqueante como Thread.sleep() se ejecuta directamente en este hilo, la cola de eventos queda completamente detenida: no se procesan eventos de ratón, teclado, renderizado de pantalla ni animaciones. Por esta razón, todo trabajo prolongado debe delegarse a hilos secundarios en segundo plano (Thread/Runnable) y comunicarse con la UI de forma asíncrona mediante Platform.runLater()."
+                           wrapText="true"
+                           style="-fx-text-fill: #334155; -fx-font-size: 12px;"/>
+                </VBox>
+            </VBox>
+        </Tab>
+
+    </TabPane>
+</VBox>

@@ -1,0 +1,142 @@
+/* =========================================================================
+   Estilos Corporativos - NicaData Solutions S.A.
+   Práctica Guiada: Hilos en JavaFX
+   ========================================================================= */
+
+.root {
+    -fx-font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    -fx-base: #f8fafc;
+    -fx-background-color: #f1f5f9;
+}
+
+/* TabPane */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 8 8 0 0;
+    -fx-padding: 8 18;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #1e40af;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+}
+
+/* Tarjetas y Contenedores */
+.card-box {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 3);
+    -fx-padding: 16;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}
+
+/* Tipografía y Etiquetas */
+.titulo-principal {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.subtitulo {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.card-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.estado-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #334155;
+    -fx-font-weight: 500;
+}
+
+.porcentaje-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2563eb;
+}
+
+/* Botones con estilo moderno */
+.btn-primary {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.btn-danger {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #b91c1c;
+}
+
+.btn-secondary {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #334155;
+    -fx-font-weight: bold;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+.button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+/* Barras de progreso */
+.progress-bar > .track {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 6;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #3b82f6, #1d4ed8);
+    -fx-background-radius: 6;
+    -fx-padding: 6;
+}
+
+.progress-bar-products > .bar {
+    -fx-background-color: linear-gradient(to right, #10b981, #047857);
+    -fx-background-radius: 6;
+    -fx-padding: 6;
+}
