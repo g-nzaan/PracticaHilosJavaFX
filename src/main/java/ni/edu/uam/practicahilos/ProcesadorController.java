@@ -7,9 +7,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 
 /**
- * Controlador principal para la práctica de concurrencia en JavaFX.
+ * Controlador principal para la práctica de concurrencia en JavaFX (100% Java).
  * Implementa el procesamiento básico (Pasos 1-4), el experimento de bloqueo de interfaz (Paso 6)
  * y el Reto Final de procesamiento concurrente multi-hilo (Clientes y Productos).
+ * 
+ * Incluye soporte de detención controlada con preservación de estado:
+ * al detener un proceso en curso, el avance no se pierde y puede reanudarse / continuarse
+ * desde el último registro procesado.
  */
 public class ProcesadorController {
 
@@ -35,6 +39,8 @@ public class ProcesadorController {
     private Button btnReiniciar;
 
     private Thread hiloProceso;
+    // Estado de progreso persistente (0 a 100) para reanudar sin pérdida
+    private int progresoActual = 0;
 
     // =========================================================================
     // Componentes del Reto Final: Monitor Concurrente (Paso 11)
@@ -58,6 +64,8 @@ public class ProcesadorController {
     private Button btnReiniciarClientes;
 
     private Thread hiloClientes;
+    // Estado persistente de clientes (0 a 100)
+    private int progresoClientes = 0;
 
     @FXML
     private Label lblEstadoProductos;
@@ -78,6 +86,8 @@ public class ProcesadorController {
     private Button btnReiniciarProductos;
 
     private Thread hiloProductos;
+    // Estado persistente de productos (0 a 50)
+    private int progresoProductos = 0;
 
     // =========================================================================
     // Componentes del Experimento de Bloqueo UI (Paso 6)
@@ -89,7 +99,7 @@ public class ProcesadorController {
     private Button btnBloqueante;
 
     // =========================================================================
-    // LÓGICA DEL PROCESADOR BÁSICO (Pasos 1 a 4)
+    // LÓGICA DEL PROCESADOR BÁSICO (Pasos 1 a 4 con Continuación / Reanudación)
     // =========================================================================
 
     @FXML
@@ -99,17 +109,29 @@ public class ProcesadorController {
             return;
         }
 
-        barraProgreso.setProgress(0);
-        lblPorcentaje.setText("0%");
-        lblEstado.setText("Procesando registros...");
+        // Si ya había completado el 100%, reiniciar el ciclo desde 0
+        if (progresoActual >= 100) {
+            progresoActual = 0;
+            barraProgreso.setProgress(0);
+            lblPorcentaje.setText("0%");
+        }
+
+        final boolean esReanudacion = (progresoActual > 0);
+        if (esReanudacion) {
+            lblEstado.setText("Reanudando procesamiento desde registro " + (progresoActual + 1) + "...");
+        } else {
+            lblEstado.setText("Procesando registros...");
+        }
 
         btnIniciar.setDisable(true);
         btnDetener.setDisable(false);
         btnReiniciar.setDisable(true);
 
+        final int inicio = progresoActual + 1;
+
         Runnable tarea = () -> {
             try {
-                for (int i = 1; i <= 100; i++) {
+                for (int i = inicio; i <= 100; i++) {
                     // Verificación de bandera de interrupción
                     if (Thread.currentThread().isInterrupted()) {
                         throw new InterruptedException();
@@ -118,6 +140,8 @@ public class ProcesadorController {
                     // Simula carga de trabajo (100 ms por registro)
                     Thread.sleep(100);
 
+                    // Guardar progreso actual para que nunca se pierda
+                    progresoActual = i;
                     final int avance = i;
 
                     // Actualización segura del hilo de JavaFX
@@ -128,16 +152,19 @@ public class ProcesadorController {
                 }
 
                 Platform.runLater(() -> {
-                    lblEstado.setText("Proceso finalizado");
+                    lblEstado.setText("Proceso finalizado (100% completado)");
+                    btnIniciar.setText("Iniciar");
                     habilitarBotones();
                 });
 
             } catch (InterruptedException e) {
-                // Restablecer el estado de interrupción del hilo
+                // Restablecer la bandera de interrupción
                 Thread.currentThread().interrupt();
 
+                final int pausado = progresoActual;
                 Platform.runLater(() -> {
-                    lblEstado.setText("Proceso detenido");
+                    lblEstado.setText("Proceso detenido en " + pausado + "%. Progreso conservado.");
+                    btnIniciar.setText("Continuar (" + pausado + "%)");
                     habilitarBotones();
                 });
             }
@@ -160,13 +187,16 @@ public class ProcesadorController {
 
     @FXML
     private void reiniciarProceso() {
+        // No reiniciar si el hilo está activamente procesando
         if (hiloProceso != null && hiloProceso.isAlive()) {
             return;
         }
 
+        progresoActual = 0;
         barraProgreso.setProgress(0);
         lblPorcentaje.setText("0%");
         lblEstado.setText("Esperando inicio");
+        btnIniciar.setText("Iniciar");
 
         habilitarBotones();
     }
@@ -178,11 +208,11 @@ public class ProcesadorController {
     }
 
     // =========================================================================
-    // LÓGICA DEL RETO FINAL: MONITOR DE PROCESOS CONCURRENTES (Paso 11)
+    // LÓGICA DEL RETO FINAL: MONITOR CONCURRENTE CON CONTINUACIÓN (Paso 11)
     // =========================================================================
 
     /**
-     * Inicia el procesamiento concurrente de Clientes (100 registros a 80 ms).
+     * Inicia o continúa el procesamiento concurrente de Clientes (100 registros a 80 ms).
      */
     @FXML
     private void iniciarClientes() {
@@ -190,9 +220,18 @@ public class ProcesadorController {
             return;
         }
 
-        barraClientes.setProgress(0);
-        lblPorcentajeClientes.setText("0% (0/100)");
-        lblEstadoClientes.setText("Procesando clientes...");
+        if (progresoClientes >= 100) {
+            progresoClientes = 0;
+            barraClientes.setProgress(0);
+            lblPorcentajeClientes.setText("0% (0/100)");
+        }
+
+        final boolean esReanudacion = (progresoClientes > 0);
+        if (esReanudacion) {
+            lblEstadoClientes.setText("Continuando clientes desde " + (progresoClientes + 1) + "/100...");
+        } else {
+            lblEstadoClientes.setText("Procesando clientes...");
+        }
 
         btnIniciarClientes.setDisable(true);
         btnDetenerClientes.setDisable(false);
@@ -200,16 +239,18 @@ public class ProcesadorController {
 
         final int totalClientes = 100;
         final int tiempoEsperaMs = 80; // Tiempo diferenciado
+        final int inicio = progresoClientes + 1;
 
         Runnable tareaClientes = () -> {
             try {
-                for (int i = 1; i <= totalClientes; i++) {
+                for (int i = inicio; i <= totalClientes; i++) {
                     if (Thread.currentThread().isInterrupted()) {
                         throw new InterruptedException();
                     }
 
                     Thread.sleep(tiempoEsperaMs);
 
+                    progresoClientes = i;
                     final int avance = i;
                     Platform.runLater(() -> {
                         barraClientes.setProgress(avance / (double) totalClientes);
@@ -219,13 +260,16 @@ public class ProcesadorController {
 
                 Platform.runLater(() -> {
                     lblEstadoClientes.setText("Completado (100 clientes procesados)");
+                    btnIniciarClientes.setText("Iniciar Clientes");
                     habilitarBotonesClientes();
                 });
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                final int pausado = progresoClientes;
                 Platform.runLater(() -> {
-                    lblEstadoClientes.setText("Proceso de clientes detenido");
+                    lblEstadoClientes.setText("Detenido en cliente " + pausado + "/100. Progreso conservado.");
+                    btnIniciarClientes.setText("Continuar Clientes (" + pausado + "%)");
                     habilitarBotonesClientes();
                 });
             }
@@ -252,9 +296,11 @@ public class ProcesadorController {
             return;
         }
 
+        progresoClientes = 0;
         barraClientes.setProgress(0);
         lblPorcentajeClientes.setText("0% (0/100)");
         lblEstadoClientes.setText("Esperando inicio");
+        btnIniciarClientes.setText("Iniciar Clientes");
         habilitarBotonesClientes();
     }
 
@@ -265,7 +311,7 @@ public class ProcesadorController {
     }
 
     /**
-     * Inicia el procesamiento concurrente de Productos (50 registros a 140 ms).
+     * Inicia o continúa el procesamiento concurrente de Productos (50 registros a 140 ms).
      */
     @FXML
     private void iniciarProductos() {
@@ -273,9 +319,18 @@ public class ProcesadorController {
             return;
         }
 
-        barraProductos.setProgress(0);
-        lblPorcentajeProductos.setText("0% (0/50)");
-        lblEstadoProductos.setText("Procesando productos...");
+        if (progresoProductos >= 50) {
+            progresoProductos = 0;
+            barraProductos.setProgress(0);
+            lblPorcentajeProductos.setText("0% (0/50)");
+        }
+
+        final boolean esReanudacion = (progresoProductos > 0);
+        if (esReanudacion) {
+            lblEstadoProductos.setText("Continuando productos desde " + (progresoProductos + 1) + "/50...");
+        } else {
+            lblEstadoProductos.setText("Procesando productos...");
+        }
 
         btnIniciarProductos.setDisable(true);
         btnDetenerProductos.setDisable(false);
@@ -283,16 +338,18 @@ public class ProcesadorController {
 
         final int totalProductos = 50;
         final int tiempoEsperaMs = 140; // Tiempo diferenciado
+        final int inicio = progresoProductos + 1;
 
         Runnable tareaProductos = () -> {
             try {
-                for (int i = 1; i <= totalProductos; i++) {
+                for (int i = inicio; i <= totalProductos; i++) {
                     if (Thread.currentThread().isInterrupted()) {
                         throw new InterruptedException();
                     }
 
                     Thread.sleep(tiempoEsperaMs);
 
+                    progresoProductos = i;
                     final int avance = i;
                     Platform.runLater(() -> {
                         barraProductos.setProgress(avance / (double) totalProductos);
@@ -302,13 +359,17 @@ public class ProcesadorController {
 
                 Platform.runLater(() -> {
                     lblEstadoProductos.setText("Completado (50 productos procesados)");
+                    btnIniciarProductos.setText("Iniciar Productos");
                     habilitarBotonesProductos();
                 });
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                final int pausado = progresoProductos;
                 Platform.runLater(() -> {
-                    lblEstadoProductos.setText("Proceso de productos detenido");
+                    int porc = (int) Math.round((pausado / (double) totalProductos) * 100.0);
+                    lblEstadoProductos.setText("Detenido en producto " + pausado + "/50. Progreso conservado.");
+                    btnIniciarProductos.setText("Continuar Productos (" + porc + "%)");
                     habilitarBotonesProductos();
                 });
             }
@@ -335,9 +396,11 @@ public class ProcesadorController {
             return;
         }
 
+        progresoProductos = 0;
         barraProductos.setProgress(0);
         lblPorcentajeProductos.setText("0% (0/50)");
         lblEstadoProductos.setText("Esperando inicio");
+        btnIniciarProductos.setText("Iniciar Productos");
         habilitarBotonesProductos();
     }
 
@@ -348,7 +411,7 @@ public class ProcesadorController {
     }
 
     /**
-     * Inicia ambos procesos concurrentemente.
+     * Inicia o reanuda ambos procesos concurrentemente sin perder avance previo.
      */
     @FXML
     private void iniciarTodos() {
@@ -357,7 +420,7 @@ public class ProcesadorController {
     }
 
     /**
-     * Detiene ambos procesos concurrentemente.
+     * Detiene ambos procesos concurrentemente preservando su avance individual.
      */
     @FXML
     private void detenerTodos() {
@@ -366,7 +429,7 @@ public class ProcesadorController {
     }
 
     /**
-     * Reinicia ambos procesos concurrentemente.
+     * Reinicia ambos procesos a 0%.
      */
     @FXML
     private void reiniciarTodos() {
