@@ -6,17 +6,19 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 /**
- * Implementación 100% en código Java puro (sin FXML).
- * Construye la interfaz gráfica mediante código imperativo Java y gestiona
- * los hilos de ejecución con Thread y Runnable, garantizando que el avance
- * no se pierda al pausar/detener y continuar.
+ * Implementación 100% en código Java puro (sin FXML y sin CSS).
+ * Todos los controles, jerarquías de vista, colores, tipografías y bordes
+ * se configuran exclusivamente mediante clases y métodos de la API de Java.
+ * 
+ * Además, garantiza que al detener/pausar cualquier proceso en curso,
+ * el avance no se pierda y pueda continuarse limpiamente.
  */
 public class MainAppPuroJava extends Application {
 
@@ -30,7 +32,7 @@ public class MainAppPuroJava extends Application {
     private Button btnDetenerClientes;
     private Button btnReiniciarClientes;
     private Thread hiloClientes;
-    private int progresoClientes = 0; // Persistencia del progreso
+    private int progresoClientes = 0; // Persistencia de avance
 
     // ---------------------------------------------------------
     // Componentes del Reto Final: Monitor de Productos
@@ -42,7 +44,7 @@ public class MainAppPuroJava extends Application {
     private Button btnDetenerProductos;
     private Button btnReiniciarProductos;
     private Thread hiloProductos;
-    private int progresoProductos = 0; // Persistencia del progreso
+    private int progresoProductos = 0; // Persistencia de avance
 
     // ---------------------------------------------------------
     // Componentes del Caso Básico (Pasos 1-5 de la Guía)
@@ -54,7 +56,7 @@ public class MainAppPuroJava extends Application {
     private Button btnDetenerBasico;
     private Button btnReiniciarBasico;
     private Thread hiloBasico;
-    private int progresoBasico = 0; // Persistencia del progreso
+    private int progresoBasico = 0; // Persistencia de avance
 
     // ---------------------------------------------------------
     // Componentes del Experimento de Bloqueo UI (Paso 6)
@@ -65,14 +67,17 @@ public class MainAppPuroJava extends Application {
     public void start(Stage stage) {
         VBox root = new VBox(12);
         root.setPadding(new Insets(16, 20, 16, 20));
-        root.setStyle("-fx-font-family: 'Segoe UI', sans-serif; -fx-background-color: #f1f5f9;");
+        root.setBackground(new Background(new BackgroundFill(Color.rgb(241, 245, 249), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        // Encabezado Corporativo
+        // Encabezado Corporativo (Configurado 100% con clases Java)
         VBox headerBox = new VBox(3);
         Label lblTitulo = new Label("NicaData Solutions S.A.");
-        lblTitulo.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0f172a;");
-        Label lblSubtitulo = new Label("Sistema de Procesamiento Concurrente (100% Java)");
-        lblSubtitulo.setStyle("-fx-font-size: 13px; -fx-text-fill: #64748b;");
+        lblTitulo.setFont(Font.font("Segoe UI", FontWeight.BOLD, 20));
+        lblTitulo.setTextFill(Color.rgb(15, 23, 42));
+
+        Label lblSubtitulo = new Label("Sistema de Procesamiento Concurrente (100% Java Puro - Cero CSS)");
+        lblSubtitulo.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 13));
+        lblSubtitulo.setTextFill(Color.rgb(100, 116, 139));
         headerBox.getChildren().addAll(lblTitulo, lblSubtitulo);
 
         TabPane tabPane = new TabPane();
@@ -103,7 +108,7 @@ public class MainAppPuroJava extends Application {
     }
 
     // =========================================================================
-    // CONSTRUCCIÓN GRÁFICA EN CÓDIGO JAVA PURO (SIN FXML)
+    // CONSTRUCCIÓN DE VISTAS (100% JAVA PURO, SIN CSS)
     // =========================================================================
 
     private VBox crearVistaMonitor() {
@@ -112,20 +117,25 @@ public class MainAppPuroJava extends Application {
 
         // --- Tarjeta Clientes ---
         VBox cardClientes = new VBox(8);
-        aplicarEstiloCard(cardClientes);
+        aplicarEstiloCardJava(cardClientes);
 
         HBox headerClientes = new HBox(10);
         headerClientes.setAlignment(Pos.CENTER_LEFT);
         Label lblTitClientes = new Label("Procesamiento de Clientes");
-        lblTitClientes.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e293b;");
+        lblTitClientes.setFont(Font.font("Segoe UI", FontWeight.BOLD, 15));
+        lblTitClientes.setTextFill(Color.rgb(30, 41, 59));
+
         Region spacerC = new Region();
         HBox.setHgrow(spacerC, Priority.ALWAYS);
+
         lblPorcentajeClientes = new Label("0% (0/100)");
-        lblPorcentajeClientes.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb;");
+        lblPorcentajeClientes.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+        lblPorcentajeClientes.setTextFill(Color.rgb(37, 99, 235));
         headerClientes.getChildren().addAll(lblTitClientes, spacerC, lblPorcentajeClientes);
 
         lblEstadoClientes = new Label("Esperando inicio");
-        lblEstadoClientes.setStyle("-fx-font-size: 13px; -fx-text-fill: #334155;");
+        lblEstadoClientes.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 13));
+        lblEstadoClientes.setTextFill(Color.rgb(51, 65, 85));
 
         barraClientes = new ProgressBar(0);
         barraClientes.setMaxWidth(Double.MAX_VALUE);
@@ -134,21 +144,22 @@ public class MainAppPuroJava extends Application {
         HBox footerClientes = new HBox(10);
         footerClientes.setAlignment(Pos.CENTER_RIGHT);
         Label lblInfoC = new Label("Meta: 100 registros | 80 ms/reg");
-        lblInfoC.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b;");
+        lblInfoC.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 11));
+        lblInfoC.setTextFill(Color.rgb(100, 116, 139));
         Region spacerC2 = new Region();
         HBox.setHgrow(spacerC2, Priority.ALWAYS);
 
         btnIniciarClientes = new Button("Iniciar Clientes");
-        btnIniciarClientes.setStyle("-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 7 14;");
+        aplicarBotonPrimarioJava(btnIniciarClientes);
         btnIniciarClientes.setOnAction(e -> iniciarClientes());
 
         btnDetenerClientes = new Button("Detener");
         btnDetenerClientes.setDisable(true);
-        btnDetenerClientes.setStyle("-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 7 14;");
+        aplicarBotonPeligroJava(btnDetenerClientes);
         btnDetenerClientes.setOnAction(e -> detenerClientes());
 
         btnReiniciarClientes = new Button("Reiniciar");
-        btnReiniciarClientes.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 7 14;");
+        aplicarBotonSecundarioJava(btnReiniciarClientes);
         btnReiniciarClientes.setOnAction(e -> reiniciarClientes());
 
         footerClientes.getChildren().addAll(lblInfoC, spacerC2, btnIniciarClientes, btnDetenerClientes, btnReiniciarClientes);
@@ -156,20 +167,25 @@ public class MainAppPuroJava extends Application {
 
         // --- Tarjeta Productos ---
         VBox cardProductos = new VBox(8);
-        aplicarEstiloCard(cardProductos);
+        aplicarEstiloCardJava(cardProductos);
 
         HBox headerProductos = new HBox(10);
         headerProductos.setAlignment(Pos.CENTER_LEFT);
         Label lblTitProd = new Label("Procesamiento de Productos");
-        lblTitProd.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e293b;");
+        lblTitProd.setFont(Font.font("Segoe UI", FontWeight.BOLD, 15));
+        lblTitProd.setTextFill(Color.rgb(30, 41, 59));
+
         Region spacerP = new Region();
         HBox.setHgrow(spacerP, Priority.ALWAYS);
+
         lblPorcentajeProductos = new Label("0% (0/50)");
-        lblPorcentajeProductos.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #059669;");
+        lblPorcentajeProductos.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+        lblPorcentajeProductos.setTextFill(Color.rgb(5, 150, 105));
         headerProductos.getChildren().addAll(lblTitProd, spacerP, lblPorcentajeProductos);
 
         lblEstadoProductos = new Label("Esperando inicio");
-        lblEstadoProductos.setStyle("-fx-font-size: 13px; -fx-text-fill: #334155;");
+        lblEstadoProductos.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 13));
+        lblEstadoProductos.setTextFill(Color.rgb(51, 65, 85));
 
         barraProductos = new ProgressBar(0);
         barraProductos.setMaxWidth(Double.MAX_VALUE);
@@ -178,21 +194,22 @@ public class MainAppPuroJava extends Application {
         HBox footerProductos = new HBox(10);
         footerProductos.setAlignment(Pos.CENTER_RIGHT);
         Label lblInfoP = new Label("Meta: 50 registros | 140 ms/reg");
-        lblInfoP.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b;");
+        lblInfoP.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 11));
+        lblInfoP.setTextFill(Color.rgb(100, 116, 139));
         Region spacerP2 = new Region();
         HBox.setHgrow(spacerP2, Priority.ALWAYS);
 
         btnIniciarProductos = new Button("Iniciar Productos");
-        btnIniciarProductos.setStyle("-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 7 14;");
+        aplicarBotonPrimarioJava(btnIniciarProductos);
         btnIniciarProductos.setOnAction(e -> iniciarProductos());
 
         btnDetenerProductos = new Button("Detener");
         btnDetenerProductos.setDisable(true);
-        btnDetenerProductos.setStyle("-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 7 14;");
+        aplicarBotonPeligroJava(btnDetenerProductos);
         btnDetenerProductos.setOnAction(e -> detenerProductos());
 
         btnReiniciarProductos = new Button("Reiniciar");
-        btnReiniciarProductos.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 7 14;");
+        aplicarBotonSecundarioJava(btnReiniciarProductos);
         btnReiniciarProductos.setOnAction(e -> reiniciarProductos());
 
         footerProductos.getChildren().addAll(lblInfoP, spacerP2, btnIniciarProductos, btnDetenerProductos, btnReiniciarProductos);
@@ -203,16 +220,16 @@ public class MainAppPuroJava extends Application {
         globalBox.setAlignment(Pos.CENTER);
         globalBox.setPadding(new Insets(4, 0, 0, 0));
 
-        Button btnIniciarAmbos = new Button("▶ Iniciar Ambos Procesos");
-        btnIniciarAmbos.setStyle("-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16;");
+        Button btnIniciarAmbos = new Button("Iniciar Ambos Procesos");
+        aplicarBotonPrimarioJava(btnIniciarAmbos);
         btnIniciarAmbos.setOnAction(e -> { iniciarClientes(); iniciarProductos(); });
 
-        Button btnDetenerAmbos = new Button("⏹ Detener Todos");
-        btnDetenerAmbos.setStyle("-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16;");
+        Button btnDetenerAmbos = new Button("Detener Todos");
+        aplicarBotonPeligroJava(btnDetenerAmbos);
         btnDetenerAmbos.setOnAction(e -> { detenerClientes(); detenerProductos(); });
 
-        Button btnReiniciarAmbos = new Button("↺ Reiniciar Todos");
-        btnReiniciarAmbos.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16;");
+        Button btnReiniciarAmbos = new Button("Reiniciar Todos");
+        aplicarBotonSecundarioJava(btnReiniciarAmbos);
         btnReiniciarAmbos.setOnAction(e -> { reiniciarClientes(); reiniciarProductos(); });
 
         globalBox.getChildren().addAll(btnIniciarAmbos, btnDetenerAmbos, btnReiniciarAmbos);
@@ -227,32 +244,33 @@ public class MainAppPuroJava extends Application {
         content.setPadding(new Insets(25, 25, 25, 25));
 
         Label lblTitulo = new Label("Procesador de registros");
-        lblTitulo.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        lblTitulo.setFont(Font.font("Segoe UI", FontWeight.BOLD, 22));
 
         lblEstadoBasico = new Label("Esperando inicio");
-        lblEstadoBasico.setStyle("-fx-font-size: 14px;");
+        lblEstadoBasico.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 14));
 
         barraBasica = new ProgressBar(0);
         barraBasica.setPrefWidth(420);
         barraBasica.setPrefHeight(24);
 
         lblPorcentajeBasico = new Label("0%");
-        lblPorcentajeBasico.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2563eb;");
+        lblPorcentajeBasico.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+        lblPorcentajeBasico.setTextFill(Color.rgb(37, 99, 235));
 
         HBox botonesBox = new HBox(12);
         botonesBox.setAlignment(Pos.CENTER);
 
         btnIniciarBasico = new Button("Iniciar");
-        btnIniciarBasico.setStyle("-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16;");
+        aplicarBotonPrimarioJava(btnIniciarBasico);
         btnIniciarBasico.setOnAction(e -> iniciarBasico());
 
         btnDetenerBasico = new Button("Detener");
         btnDetenerBasico.setDisable(true);
-        btnDetenerBasico.setStyle("-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16;");
+        aplicarBotonPeligroJava(btnDetenerBasico);
         btnDetenerBasico.setOnAction(e -> detenerBasico());
 
         btnReiniciarBasico = new Button("Reiniciar");
-        btnReiniciarBasico.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16;");
+        aplicarBotonSecundarioJava(btnReiniciarBasico);
         btnReiniciarBasico.setOnAction(e -> reiniciarBasico());
 
         botonesBox.getChildren().addAll(btnIniciarBasico, btnDetenerBasico, btnReiniciarBasico);
@@ -265,39 +283,74 @@ public class MainAppPuroJava extends Application {
         content.setPadding(new Insets(18, 20, 18, 20));
 
         VBox cardExp = new VBox(8);
-        aplicarEstiloCard(cardExp);
+        aplicarEstiloCardJava(cardExp);
         Label lblExpTit = new Label("Experimento: Bloqueo del JavaFX Application Thread");
-        lblExpTit.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e293b;");
+        lblExpTit.setFont(Font.font("Segoe UI", FontWeight.BOLD, 15));
+        lblExpTit.setTextFill(Color.rgb(30, 41, 59));
+
         Label lblExpDesc = new Label("Al presionar el botón, se ejecutará Thread.sleep(5000) en el hilo principal de la UI. La ventana se congelará durante 5 segundos.");
+        lblExpDesc.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 13));
         lblExpDesc.setWrapText(true);
 
         HBox btnRow = new HBox(15);
         btnRow.setAlignment(Pos.CENTER_LEFT);
-        Button btnBloqueante = new Button("⚠ Ejecutar Proceso Bloqueante (5s)");
-        btnBloqueante.setStyle("-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16;");
+        Button btnBloqueante = new Button("Ejecutar Proceso Bloqueante (5s)");
+        aplicarBotonPeligroJava(btnBloqueante);
         btnBloqueante.setOnAction(e -> procesoBloqueante());
 
         lblEstadoBloqueo = new Label("Estado: Normal (UI Desbloqueada)");
-        lblEstadoBloqueo.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;");
+        lblEstadoBloqueo.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
+        lblEstadoBloqueo.setTextFill(Color.rgb(51, 65, 85));
         btnRow.getChildren().addAll(btnBloqueante, lblEstadoBloqueo);
 
         cardExp.getChildren().addAll(lblExpTit, lblExpDesc, btnRow);
 
         VBox cardPregunta = new VBox(8);
-        aplicarEstiloCard(cardPregunta);
+        aplicarEstiloCardJava(cardPregunta);
         Label lblPreguntaTit = new Label("Pregunta de Análisis: ¿Por qué no debemos ejecutar procesos prolongados dentro de eventos de JavaFX?");
-        lblPreguntaTit.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;");
+        lblPreguntaTit.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
+        lblPreguntaTit.setTextFill(Color.rgb(30, 41, 59));
+
         Label lblPreguntaResp = new Label("JavaFX opera bajo un Modelo de Hilo Único (JavaFX Application Thread). Si se realiza una llamada bloqueante en este hilo, se detiene el procesamiento de eventos del mouse/teclado y el redibujado de la escena a 60 FPS. Por eso, toda tarea pesada debe delegarse a hilos secundarios en segundo plano (Thread/Runnable) y comunicarse con la UI exclusivamente mediante Platform.runLater().");
+        lblPreguntaResp.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 12));
+        lblPreguntaResp.setTextFill(Color.rgb(51, 65, 85));
         lblPreguntaResp.setWrapText(true);
-        lblPreguntaResp.setStyle("-fx-text-fill: #334155; -fx-font-size: 12px;");
         cardPregunta.getChildren().addAll(lblPreguntaTit, lblPreguntaResp);
 
         content.getChildren().addAll(cardExp, cardPregunta);
         return content;
     }
 
-    private void aplicarEstiloCard(VBox box) {
-        box.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 16; -fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-border-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 3);");
+    // =========================================================================
+    // MÉTODOS DE ESTILO CON CLASES JAVA PURAS (CERO CSS)
+    // =========================================================================
+
+    private void aplicarEstiloCardJava(VBox box) {
+        box.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(10), Insets.EMPTY)));
+        box.setBorder(new Border(new BorderStroke(Color.rgb(226, 232, 240), BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(1))));
+        box.setPadding(new Insets(16));
+    }
+
+    private void aplicarBotonPrimarioJava(Button btn) {
+        btn.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
+        btn.setTextFill(Color.WHITE);
+        btn.setBackground(new Background(new BackgroundFill(Color.rgb(37, 99, 235), new CornerRadii(6), Insets.EMPTY)));
+        btn.setPadding(new Insets(8, 16, 8, 16));
+    }
+
+    private void aplicarBotonPeligroJava(Button btn) {
+        btn.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
+        btn.setTextFill(Color.WHITE);
+        btn.setBackground(new Background(new BackgroundFill(Color.rgb(220, 38, 38), new CornerRadii(6), Insets.EMPTY)));
+        btn.setPadding(new Insets(8, 16, 8, 16));
+    }
+
+    private void aplicarBotonSecundarioJava(Button btn) {
+        btn.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
+        btn.setTextFill(Color.rgb(51, 65, 85));
+        btn.setBackground(new Background(new BackgroundFill(Color.rgb(241, 245, 249), new CornerRadii(6), Insets.EMPTY)));
+        btn.setBorder(new Border(new BorderStroke(Color.rgb(203, 213, 225), BorderStrokeStyle.SOLID, new CornerRadii(6), new BorderWidths(1))));
+        btn.setPadding(new Insets(8, 16, 8, 16));
     }
 
     // =========================================================================

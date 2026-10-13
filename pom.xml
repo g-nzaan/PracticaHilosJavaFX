@@ -47,7 +47,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>ni.edu.uam.practicahilos/ni.edu.uam.practicahilos.MainApp</mainClass>
+                            <mainClass>ni.edu.uam.practicahilos/ni.edu.uam.practicahilos.MainAppPuroJava</mainClass>
                         </configuration>
                     </execution>
                 </executions>

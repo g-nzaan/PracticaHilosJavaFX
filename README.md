@@ -19,25 +19,24 @@
 
 ---
 
-## 2. Naturaleza del Proyecto: 100% Java Puro
+## 2. Naturaleza del Proyecto: 100% Java Puro (Cero CSS)
 
 > [!IMPORTANT]
-> **Desarrollo 100% Java:**  
-> La aplicación está desarrollada enteramente en **Java (JDK 21) y JavaFX nativo**. No contiene ninguna línea de código en JavaScript, ni WebViews, ni frameworks web. Todo el control concurrente se gestiona directamente en la JVM mediante `java.lang.Thread`, `java.lang.Runnable` y la cola de eventos de `javafx.application.Platform.runLater()`.
->
-> Para mayor flexibilidad y rigor académico, el proyecto incluye dos modalidades:
-> 1. **Modalidad FXML + Controlador:** (`MainApp.java` + `ProcesadorController.java` + `procesador-view.fxml`), siguiendo exactamente los pasos 1 a 5 de la guía.
-> 2. **Modalidad 100% Código Java Imperativo:** (`MainAppPuroJava.java`), donde la interfaz se instancia y diseña completamente mediante clases Java puras sin archivos FXML externos.
+> **Arquitectura 100% Java:**  
+> La aplicación está construida enteramente en **código Java (JDK 21) utilizando la API de JavaFX**.  
+> * **Cero archivos CSS:** No existe ningún archivo `.css` en todo el proyecto.
+> * **Cero JavaScript:** Toda la lógica concurrente, contadores y simulación se ejecutan en la JVM con `java.lang.Thread` y `java.lang.Runnable`.
+> * **Diseño en Java puro:** Toda la interfaz gráfica, fuentes (`Font`), colores (`Color`), fondos (`Background`) y márgenes (`Insets`) se configuran mediante métodos e instancias de la API de Java en `MainAppPuroJava.java`.
 
 ---
 
-## 3. Funcionalidad Clave: Pausa, Detención y Reanudación de Progreso
+## 3. Preservación del Avance al Detener y Continuar
 
-A diferencia de implementaciones ingenuas donde detener un hilo destruye el avance obligando a reiniciar desde 0:
-* **Persistencia de estado:** Cada proceso mantiene variables de control persistentes (`progresoActual`, `progresoClientes`, `progresoProductos`).
-* **Detención controlada:** Al presionar **Detener**, se interrumpe el hilo (`interrupt()`) y se conserva el último índice completado en memoria y en pantalla.
-* **Reanudación transparente:** Al presionar **Continuar**, el nuevo hilo arranca automáticamente a partir de `progreso + 1` hasta completar la meta total.
-* **Reinicio explícito:** El avance solo se restablece a 0% cuando el usuario presiona voluntariamente el botón **Reiniciar**, o tras finalizar exitosamente el 100%.
+A diferencia de implementaciones que pierden el avance al pausar:
+* **Persistencia en memoria:** Cada hilo almacena de forma continua su progreso (`progresoActual`, `progresoClientes`, `progresoProductos`).
+* **Detención limpia:** Al hacer clic en **Detener**, se interrumpe el hilo (`interrupt()`) y el porcentaje alcanzado no se reinicia.
+* **Continuación inmediata:** Al presionar **Continuar**, el nuevo hilo retoma el procesamiento en `progreso + 1` sin perder el trabajo ya realizado.
+* **Reinicio manual:** El avance sólo vuelve a 0% cuando el usuario presiona voluntariamente el botón **Reiniciar** o cuando el proceso completa el 100%.
 
 ---
 
@@ -56,7 +55,7 @@ A diferencia de implementaciones ingenuas donde detener un hilo destruye el avan
 
 ---
 
-## 5. Estructura del Proyecto
+## 5. Estructura del Proyecto (100% Java)
 
 ```text
 PracticaHilosJavaFX/
@@ -75,20 +74,19 @@ PracticaHilosJavaFX/
 │       ├── java/
 │       │   ├── module-info.java         # Descriptor modular Java 21
 │       │   └── ni/edu/uam/practicahilos/
-│       │       ├── Launcher.java        # Selector de inicio universal
-│       │       ├── MainApp.java         # Versión con FXML (Paso 1-5 y Reto)
-│       │       ├── MainAppPuroJava.java # Versión 100% código Java sin FXML
-│       │       ├── ProcesadorController.java # Lógica de hilos, concurrencia y reanudación
+│       │       ├── Launcher.java        # Punto de entrada universal (100% Java)
+│       │       ├── MainAppPuroJava.java # Aplicación principal 100% Java Puro (Sin FXML, Cero CSS)
+│       │       ├── MainApp.java         # Inicializador alternativo con FXML
+│       │       ├── ProcesadorController.java # Controlador con persistencia de avance
 │       │       └── GeneradorCapturas.java    # Generador automatizado de capturas
 │       │
 │       └── resources/
 │           └── ni/edu/uam/practicahilos/
-│               ├── procesador-view.fxml # Vista FXML corporativa con pestañas
-│               └── styles.css           # Hoja de estilos moderna y ergonómica
+│               └── procesador-view.fxml # Vista FXML limpia (sin hojas CSS)
 │
 ├── .gitignore
 ├── mvnw / mvnw.cmd                      # Wrappers Maven multiplataforma
-├── pom.xml                              # Gestión de dependencias y plugins
+├── pom.xml                              # Configuración Maven (Java 21, JavaFX 21.0.6)
 └── README.md                            # Documentación integral de la práctica
 ```
 
@@ -96,11 +94,11 @@ PracticaHilosJavaFX/
 
 ## 6. Implementación de la Guía (Pasos 1 a 5)
 
-En la pestaña **"Proceso Básico (Pasos 1-5)"** se encuentra la implementación directa del ejercicio guiado solicitado:
+En la pestaña **"Proceso Básico (Pasos 1-5)"** se encuentra la implementación del ejercicio guiado:
 
 * **Componentes utilizados:** `lblEstado`, `barraProgreso`, `lblPorcentaje`, `btnIniciar`, `btnDetener`, `btnReiniciar`.
 * **Procesamiento:** Itera de 1 a 100 registros con un retardo de `100 ms` por iteración (~10 segundos en total).
-* **Persistencia al pausar:** Si el proceso va por el 45% y se hace clic en **Detener**, la barra permanece en 45%, la etiqueta indica `"Proceso detenido en 45%. Progreso conservado."` y el botón cambia a `"Continuar (45%)"`. Al hacer clic nuevamente, retoma de 46 a 100.
+* **Persistencia al pausar:** Si el proceso va por el 45% y se presiona **Detener**, la barra permanece en 45%, la etiqueta indica `"Proceso detenido en 45%. Progreso conservado."` y el botón cambia a `"Continuar (45%)"`. Al hacer clic nuevamente, retoma de 46 a 100.
 * **Actualización segura:** Se utiliza `Platform.runLater()` en cada iteración para reflejar el progreso de la barra y la etiqueta porcentual.
 
 ![Proceso Básico](docs/img/proceso_basico.png)
@@ -111,7 +109,6 @@ En la pestaña **"Proceso Básico (Pasos 1-5)"** se encuentra la implementación
 
 ### Código del Experimento
 ```java
-@FXML
 private void procesoBloqueante() {
     lblEstadoBloqueo.setText("Procesando (UI Bloqueada durante 5s)...");
 
@@ -136,8 +133,8 @@ private void procesoBloqueante() {
 JavaFX opera bajo un modelo de concurrencia denominado **Single-Threaded Model** (Modelo de Hilo Único). 
 
 1. **El rol del JavaFX Application Thread:** Este único hilo es el responsable de atender la cola de eventos del sistema operativo (mouse, teclado), despachar listeners y redibujar los nodos del árbol de la escena (*Scene Graph*) a 60 FPS.
-2. **Consecuencias del bloqueo:** Si se ejecuta un método prolongado (como consultas a base de datos o `Thread.sleep()`) en este hilo, **la cola de eventos se paraliza por completo**. La ventana deja de redibujarse, el sistema operativo reporta que la aplicación no responde y el usuario no puede interactuar con ningún control.
-3. **Regla de oro:** 
+2. **Consecuencias del bloqueo:** Si se ejecuta un método prolongado (como consultas a base de datos o `Thread.sleep()`) en este hilo, **la cola de eventos se paraliza por completo**. La ventana deja de responder, el sistema operativo reporta que la aplicación no responde y el usuario no puede interactuar.
+3. **Solución:** 
    * Todo cómputo prolongado debe ejecutarse en un **hilo secundario en segundo plano (`Thread` + `Runnable`)**.
    * Cualquier actualización sobre los controles gráficos debe enviarse mediante **`Platform.runLater()`**.
 
@@ -147,10 +144,10 @@ JavaFX opera bajo un modelo de concurrencia denominado **Single-Threaded Model**
 
 Para atender a **NicaData Solutions S.A.**, se implementó el monitor concurrente con dos hilos independientes de características asimétricas:
 
-| Proceso | Meta de Registros | Retardo por Registro | Duración Aprox. | Color / Estilo |
-| :--- | :---: | :---: | :---: | :--- |
-| **Procesamiento de Clientes** | 100 registros | 80 ms | ~8.0 segundos | Azul corporativo (`#2563eb`) |
-| **Procesamiento de Productos** | 50 registros | 140 ms | ~7.0 segundos | Verde esmeralda (`#10b981`) |
+| Proceso | Meta de Registros | Retardo por Registro | Duración Aprox. |
+| :--- | :---: | :---: | :--- |
+| **Procesamiento de Clientes** | 100 registros | 80 ms | ~8.0 segundos |
+| **Procesamiento de Productos** | 50 registros | 140 ms | ~7.0 segundos |
 
 ### Características Implementadas
 1. **Concurrencia real:** Dos objetos `Thread` corriendo en paralelo sin interferirse.
@@ -174,17 +171,13 @@ Para atender a **NicaData Solutions S.A.**, se implementó el monitor concurrent
 
 ## 9. Instrucciones de Ejecución
 
-### Opción 1: Ejecutar Versión Estándar (FXML + Controlador)
+### Ejecución Directa (100% Java Puro por Defecto)
 ```bash
 mvn javafx:run
 ```
 *(O en Windows: `.\mvnw.cmd javafx:run`)*
 
-### Opción 2: Ejecutar Versión 100% Java Puro (Sin FXML)
-```bash
-mvn javafx:run -Djavafx.mainClass="ni.edu.uam.practicahilos/ni.edu.uam.practicahilos.MainAppPuroJava"
-```
-O ejecutando el método `main()` de `MainAppPuroJava.java` directamente desde IntelliJ IDEA.
+O simplemente abriendo [MainAppPuroJava.java](file:///c:/Users/choco/OneDrive/Documentos/GitHub/PracticaHilosJavaFX/src/main/java/ni/edu/uam/practicahilos/MainAppPuroJava.java) en IntelliJ IDEA y haciendo clic derecho → **Run 'MainAppPuroJava.main()'**.
 
 ---
 
